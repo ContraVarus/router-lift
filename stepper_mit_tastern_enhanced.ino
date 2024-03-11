@@ -8,7 +8,6 @@
 #define BUTTON_PIN_1 7
 #define BUTTON_PIN_2 8
 #define BUTTON_PIN_3 4
-#define BUTTON_PIN_4 4
 
 // Anzahl der Mikroschritte pro Umdrehung (um Faktor 4 erhöht)
 #define MICROSTEPS 25600
@@ -20,7 +19,6 @@ Stepper motor(MICROSTEPS, DIR_PIN, PUL_PIN);
 int prevButtonState1 = HIGH;
 int prevButtonState2 = HIGH;
 int prevButtonState3 = HIGH;
-int prevButtonState4 = HIGH;
 int stepSize = 0;
 
 void setup() {
