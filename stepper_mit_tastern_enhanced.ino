@@ -1,3 +1,13 @@
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_GrayOLED.h>
+#include <Adafruit_SPITFT.h>
+#include <Adafruit_SPITFT_Macros.h>
+#include <gfxfont.h>
+#include <splash.h>
+
+#include <Wire.h>
+
 #include <Stepper.h>
 
 // Definition der Pins für den Schrittmotor
@@ -9,7 +19,16 @@
 #define BUTTON_PIN_2 8
 #define BUTTON_PIN_3 4
 
-// Anzahl der Mikroschritte pro Umdrehung (um Faktor 4 erhöht)
+//Definition für OLED Display
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+#define SCREEN_ADDRESS 0x3C
+
+//Display Objekt erstellen
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+// Anzahl der Mikroschritte pro Umdrehung
 #define MICROSTEPS 1600
 
 // Schrittmotor-Objekt erstellen
@@ -20,7 +39,7 @@ int prevButtonState1 = HIGH;
 int prevButtonState2 = HIGH;
 int prevButtonState3 = HIGH;
 int stepSize = 0;
-bool SpeedMode = false;
+bool SpeedMode = true;
 unsigned long Startzeit;
 unsigned long GesicherteZeit = 0;
 
@@ -33,8 +52,12 @@ void setup() {
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);
   
-}
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+  Serial.println(F("SSD1306 allocation failed"));
+  for(;;); // Don't proceed, loop forever
 
+}
+}
 void loop() {
   // Aktueller Zustand der Taster
   int buttonState1 = digitalRead(BUTTON_PIN_1);
@@ -71,8 +94,16 @@ else if (SpeedMode == 0) {
       // Kurze Verzögerung für eine angemessene Geschwindigkeit
       delay(10);
         // Ausgabe der Schrittgröße in Millimeter über die serielle Konsole
-    Serial.print("Step size in millimeters: ");
-    Serial.println(stepSize * 0.01953125, 2);
+     Serial.print("Step size in millimeters: ");
+     Serial.println(stepSize * 0.01953125, 2);
+     display.clearDisplay();
+     display.setCursor(0,20);
+     display.setTextSize(1);
+     display.setTextColor(SSD1306_WHITE);
+     display.print("Hoehe: ");
+     display.print(stepSize * 0.01953125, 2);
+     display.println("mm");
+     display.display();
     }
   }
 
@@ -89,6 +120,16 @@ else if (SpeedMode == 0) {
      // Ausgabe der Schrittgröße in Millimeter über die serielle Konsole
      Serial.print("Step size in millimeters: ");
      Serial.println(stepSize * 0.01953125, 2);
+     Serial.print("Step size in millimeters: ");
+     Serial.println(stepSize * 0.01953125, 2);
+     display.clearDisplay();
+     display.setCursor(0,20);
+     display.setTextSize(1);
+     display.setTextColor(SSD1306_WHITE);
+     display.print("Hoehe: ");
+     display.print(stepSize * 0.01953125, 2);
+     display.println("mm");
+     display.display();
     }
   }
  
