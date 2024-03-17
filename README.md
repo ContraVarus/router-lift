@@ -15,8 +15,6 @@ Two buttons for up and downward of router are working. As long as you press adju
 
 
 Work in Progress:
-OLED should show what currently serial console is showing
-Add additonal button to set the routerlift speed from normal to fast
+Setting german fonts for display and adjust height
+Create end-buttons which stops motor directly
 
-Long plan:
-Endbuttons for stopping the motor once he reach top or low maximum
