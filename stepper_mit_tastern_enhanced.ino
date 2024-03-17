@@ -10,7 +10,7 @@
 #define BUTTON_PIN_3 4
 
 // Anzahl der Mikroschritte pro Umdrehung (um Faktor 4 erhöht)
-#define MICROSTEPS 25600
+#define MICROSTEPS 1600
 
 // Schrittmotor-Objekt erstellen
 Stepper motor(MICROSTEPS, DIR_PIN, PUL_PIN);
@@ -20,14 +20,14 @@ int prevButtonState1 = HIGH;
 int prevButtonState2 = HIGH;
 int prevButtonState3 = HIGH;
 int stepSize = 0;
+bool SpeedMode = false;
+unsigned long Startzeit;
+unsigned long GesicherteZeit = 0;
 
 void setup() {
   // Initialisierung der seriellen Kommunikation
   Serial.begin(9600);
   
-  // Setze die Geschwindigkeit des Motors in Umdrehungen pro Minute (RPM)
-  motor.setSpeed(50); // Hier kannst du die Geschwindigkeit ändern, wie du möchtest
-
   // Konfiguriere die Taster-Pins als Eingänge und aktiviere die internen Pull-up-Widerstände
   pinMode(BUTTON_PIN_1, INPUT_PULLUP);
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
@@ -39,8 +39,26 @@ void loop() {
   // Aktueller Zustand der Taster
   int buttonState1 = digitalRead(BUTTON_PIN_1);
   int buttonState2 = digitalRead(BUTTON_PIN_2);
-  int buttonState3 = digitalRead(BUTTON_PIN_3);
- // int stepSize = 0;
+  int buttonState3 = digitalRead(BUTTON_PIN_3); //Wert von 1 kommt zurück wenn Button auf HIGH steht
+  
+if (buttonState3 == LOW) {
+  Startzeit = millis();
+if (Startzeit - GesicherteZeit > 50)
+{
+  SpeedMode = !SpeedMode;
+}
+ GesicherteZeit = Startzeit;
+ digitalWrite(buttonState3, SpeedMode);
+ Serial.println(SpeedMode);
+
+// Setze die Geschwindigkeit des Motors in Umdrehungen pro Minute (RPM)
+if (SpeedMode == 1) {
+    motor.setSpeed(160); // Hier kannst du die Geschwindigkeit ändern, wie du möchtest
+}
+else if (SpeedMode == 0) {
+    motor.setSpeed(40);
+}
+}
 
   // Wenn der erste Taster gedrückt wird und der vorherige Zustand nicht gedrückt war
   if (buttonState1 == LOW && prevButtonState1 == HIGH) {
