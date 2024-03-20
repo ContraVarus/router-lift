@@ -15,8 +15,8 @@
 #define BUTTON_PIN_2 8                // Definition der Pins für die Taster
 #define BUTTON_PIN_3 4                // Definition der Pins für die Taster
 
-#define BUTTON_PIN_4 A1               // Definition für Endstoppschalter PIN
-#define BUTTON_PIN_5 12               // Definition für Endstoppschalter PIN
+#define BUTTON_PIN_4 12               // Definition für Endstoppschalter PIN
+#define BUTTON_PIN_5 13               // Definition für Endstoppschalter PIN
 
 #define SCREEN_WIDTH 128              //Definition für OLED Display
 #define SCREEN_HEIGHT 64
@@ -59,7 +59,6 @@ void setup() {
   display.display();
 }
 }
-
 void showDisplay() {
   display.clearDisplay();
   display.setCursor(0,20);
@@ -70,15 +69,14 @@ void showDisplay() {
   display.println("mm");
   display.display();
 }
-
 void loop() {
  int buttonState1 = digitalRead(BUTTON_PIN_1);              // Aktueller Zustand der Taster
  int buttonState2 = digitalRead(BUTTON_PIN_2);
  int buttonState3 = digitalRead(BUTTON_PIN_3);              //Wert von 1 kommt zurück wenn Button auf HIGH steht
  int buttonState4 = digitalRead(BUTTON_PIN_4);              //Wert von 1 kommt wenn Mikroschalter nicht gedrückt ist, bei Druck kommt Wert 1
  int buttonState5 = digitalRead(BUTTON_PIN_5);
-
-  digitalRead(buttonState4);
+ 
+ digitalRead(buttonState4);
   if (buttonState3 == LOW) {
   Startzeit = millis();
   if (Startzeit - GesicherteZeit > 50)
@@ -87,12 +85,10 @@ void loop() {
   }
   GesicherteZeit = Startzeit;
   digitalWrite(buttonState3, SpeedMode);
-  if (SpeedMode == 1) {
-  motor.setSpeed(800);                                       // Motorgeschwindigkeit für Fast-Mode (SpeedMode=1)
-  }
+  if (SpeedMode == true) {
+  motor.setSpeed(800);}                                      // Motorgeschwindigkeit für Fast-Mode (SpeedMode=1)
   else {
-  motor.setSpeed(100);                                       // Motorgeschwindigkeit für Slow-Mode (SpeedMode=0)
-  }
+  motor.setSpeed(100);  }                                     // Motorgeschwindigkeit für Slow-Mode (SpeedMode=0)
 }
  if (buttonState1 == LOW && prevButtonState1 == HIGH) {     // Wenn der erste Taster gedrückt wird und der vorherige Zustand nicht gedrückt war
  while (digitalRead(BUTTON_PIN_1) == LOW) {                 // Solange der erste Taster gedrückt ist
