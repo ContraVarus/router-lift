@@ -40,14 +40,12 @@ int prevEndButtonState2 = HIGH;
 int prevEndButtonState1 = HIGH;
 
 void setup() {
-  // Initialisierung der seriellen Kommunikation
-  Serial.begin(9600);
-  
-  //Motor mit langsamem Speed initialisieren
-  motor.setSpeed(40);
 
-  // Konfiguriere die Taster-Pins als Eingänge und aktiviere die internen Pull-up-Widerstände
-  pinMode(BUTTON_PIN_1, INPUT_PULLUP);
+  Serial.begin(9600);               // Initialisierung der seriellen Kommunikation
+ 
+  motor.setSpeed(40);             //Motor mit langsamem Speed initialisieren
+  
+  pinMode(BUTTON_PIN_1, INPUT_PULLUP);              // Konfiguriere die Taster-Pins als Eingänge und aktiviere die internen Pull-up-Widerstände
   pinMode(BUTTON_PIN_2, INPUT_PULLUP);
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);
   pinMode(EndBUTTON_PIN_2, INPUT_PULLUP);          //Endschalter
@@ -72,12 +70,11 @@ void loop() {
   // Aktueller Zustand der Taster
   int buttonState1 = digitalRead(BUTTON_PIN_1);
   int buttonState2 = digitalRead(BUTTON_PIN_2);
-  int buttonState3 = digitalRead(BUTTON_PIN_3); //Wert von 1 kommt zurück wenn Button auf HIGH steht
+  int buttonState3 = digitalRead(BUTTON_PIN_3);           //Wert von 1 kommt zurück wenn Button auf HIGH steht
   int EndButtonState2 = digitalRead(EndBUTTON_PIN_2);
   int EndButtonState1 = digitalRead(EndBUTTON_PIN_1);
 
-// Wenn der dritte Taster gedrückt wird, Speedchange
-if (buttonState3 == LOW) {
+if (buttonState3 == LOW) {          // Wenn der dritte Taster gedrückt wird, Speedchange
   Startzeit = millis();
 if (Startzeit - GesicherteZeit > 50)
 {
@@ -87,44 +84,28 @@ if (Startzeit - GesicherteZeit > 50)
  digitalWrite(buttonState3, SpeedMode);
 
 if (SpeedMode == true) {
-    motor.setSpeed(160); // Motorgeschwindigkeit
-}
-else {
-    motor.setSpeed(40);
-}
+    motor.setSpeed(160);          // Motorgeschwindigkeit
+} else {motor.setSpeed(40);}
 } 
-  // Wenn der erste Taster gedrückt wird und der vorherige Zustand nicht gedrückt war
-  if (buttonState1 == LOW && prevButtonState1 == HIGH && EndButtonState2 == HIGH) {
-    // Solange der erste Taster gedrückt ist und der Endschalter nicht ausgelöst wurde
-    while (digitalRead(BUTTON_PIN_1) == LOW && (digitalRead(EndBUTTON_PIN_2) == HIGH)) {
-      // Drehung um 100 Mikrostufen im Uhrzeigersinn
-      motor.step(100);
-      // Inkrementiere die Schrittgröße
-      ++stepSize;
-           // Kurze Verzögerung für eine angemessene Geschwindigkeit
-      delay(10);
-        // Ausgabe der Schrittgröße in Millimeter über die serielle Konsole
-      showDisplay();
+ if (buttonState1 == LOW && prevButtonState1 == HIGH && EndButtonState2 == HIGH) {           // Wenn der erste Taster gedrückt wird und der vorherige Zustand nicht gedrückt war
+    while (digitalRead(BUTTON_PIN_1) == LOW && (digitalRead(EndBUTTON_PIN_2) == HIGH)) {          // Solange der erste Taster gedrückt ist und der Endschalter nicht ausgelöst wurde
+      motor.step(100);                                            // Drehung um 100 Mikrostufen im Uhrzeigersinn
+      ++stepSize;                                                 // Inkrementiere die Schrittgröße
+      delay(10);          // Kurze Verzögerung für eine angemessene Geschwindigkeit
+      showDisplay();      // Ausgabe der Schrittgröße in Millimeter über OLED Display
     }
    }
-  // Wenn der zweite Taster gedrückt wird und der vorherige Zustand nicht gedrückt war
-  if (buttonState2 == LOW && prevButtonState2 == HIGH && EndButtonState1 == HIGH) {
-    // Solange der zweite Taster gedrückt ist
-    while (digitalRead(BUTTON_PIN_2) == LOW && (digitalRead(EndBUTTON_PIN_1) == HIGH)) {
-      // Drehung um 100 Mikrostufen gegen den Uhrzeigersinn
-      motor.step(-100);
-      // Dekrementiere die Schrittgröße
-      --stepSize;
-      // Kurze Verzögerung für eine angemessene Geschwindigkeit
-      delay(10);
-     // Ausgabe der Schrittgröße in Millimeter über die serielle Konsole
-     showDisplay();
+  if (buttonState2 == LOW && prevButtonState2 == HIGH && EndButtonState1 == HIGH) {          // Zweite Taster gedrückt und der vorherige Zustand nicht gedrückt war und der Endestopp nicht ausgelöst hat
+    while (digitalRead(BUTTON_PIN_2) == LOW && (digitalRead(EndBUTTON_PIN_1) == HIGH)) {    // Solange der zweite Taster gedrückt ist und Endschalter nicht betätigt
+      motor.step(-100);                     // Drehung um 100 Mikrostufen gegen den Uhrzeigersinn
+      --stepSize;                           // Dekrementiere die Schrittgröße
+      delay(10);                             // Kurze Verzögerung für eine angemessene Geschwindigkeit
+      showDisplay();                         // Ausgabe der Schrittgröße in Millimeter über OLED Display
     }
   }
-   // Speichere den aktuellen Zustand der Taster für den nächsten Durchlauf
-  prevButtonState1 = buttonState1;
+     prevButtonState1 = buttonState1;
   prevButtonState2 = buttonState2;
-  prevButtonState3 = buttonState3;
+  prevButtonState3 = buttonState3;                // Speichere den aktuellen Zustand der Taster für den nächsten Durchlauf
   prevEndButtonState1 = EndButtonState1;
   prevEndButtonState2 = EndButtonState2;
 }
