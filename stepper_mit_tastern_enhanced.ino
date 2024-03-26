@@ -18,7 +18,11 @@
 #define EndBUTTON_PIN_2 2   // Definition der Pins für die beiden Endschalter
 #define EndBUTTON_PIN_1 3
 
-#define MICROSTEPS 1600   //Anzahl der Mikroschritte des Motors pro Umdrehung
+#define WLS_PIN_1 12
+#define WLS_SENSOR1 9
+
+
+#define MICROSTEPS 3200   //Anzahl der Mikroschritte des Motors pro Umdrehung
 
 Stepper motor(MICROSTEPS, DIR_PIN, PUL_PIN);      // Schrittmotor-Objekt erstellen
 
@@ -38,6 +42,8 @@ unsigned long Startzeit;
 unsigned long GesicherteZeit = 0;
 int prevEndButtonState2 = HIGH;
 int prevEndButtonState1 = HIGH;
+int prevWLS_ButtonState1 = HIGH;
+int WLS_SENSOR = HIGH;
 
 void setup() {
 
@@ -50,12 +56,14 @@ void setup() {
   pinMode(BUTTON_PIN_3, INPUT_PULLUP);
   pinMode(EndBUTTON_PIN_2, INPUT_PULLUP);          //Endschalter
   pinMode(EndBUTTON_PIN_1, INPUT_PULLUP);
+  pinMode(WLS_PIN_1, INPUT_PULLUP);
+  pinMode(WLS_SENSOR1, INPUT_PULLUP);
 
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   Serial.println(F("SSD1306 allocation failed"));
   for(;;);                                                    // Don't proceed, loop forever
   }
-}  
+} 
 void showDisplay() {
   display.clearDisplay();
   display.setCursor(10,20);
@@ -73,13 +81,13 @@ void loop() {
   int buttonState3 = digitalRead(BUTTON_PIN_3);           //Wert von 1 kommt zurück wenn Button auf HIGH steht
   int EndButtonState2 = digitalRead(EndBUTTON_PIN_2);
   int EndButtonState1 = digitalRead(EndBUTTON_PIN_1);
+  int WLS_ButtonState1 = digitalRead(WLS_PIN_1);
+  int WLS_SENSOR = digitalRead(WLS_SENSOR1);
 
 if (buttonState3 == LOW) {          // Wenn der dritte Taster gedrückt wird, Speedchange
   Startzeit = millis();
 if (Startzeit - GesicherteZeit > 50)
-{
-  SpeedMode = !SpeedMode;
-}
+ {SpeedMode = !SpeedMode;}
  GesicherteZeit = Startzeit;
  digitalWrite(buttonState3, SpeedMode);
 
@@ -103,9 +111,18 @@ if (SpeedMode == true) {
       showDisplay();                         // Ausgabe der Schrittgröße in Millimeter über OLED Display
     }
   }
-     prevButtonState1 = buttonState1;
+  if (WLS_ButtonState1 == LOW && prevWLS_ButtonState1 == HIGH) {                      //Motor dreht solange nach oben bis der Werkzeuglängenmesser auslöst
+    while (digitalRead(WLS_SENSOR1) == HIGH){
+    motor.setSpeed(80);
+    motor.step(5000);
+    delay(10);
+   }
+  }
+  
+  prevButtonState1 = buttonState1;
   prevButtonState2 = buttonState2;
   prevButtonState3 = buttonState3;                // Speichere den aktuellen Zustand der Taster für den nächsten Durchlauf
   prevEndButtonState1 = EndButtonState1;
   prevEndButtonState2 = EndButtonState2;
+  prevWLS_ButtonState1 = WLS_ButtonState1;
 }
