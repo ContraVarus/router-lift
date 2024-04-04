@@ -15,14 +15,14 @@
 #define BUTTON_PIN_2 8
 #define BUTTON_PIN_3 4
 
-#define EndBUTTON_PIN_2 2   // Definition der Pins für die beiden Endschalter
-#define EndBUTTON_PIN_1 3
+#define EndBUTTON_PIN_2 11   // Definition der Pins für die beiden Endschalter
+#define EndBUTTON_PIN_1 10
 
 #define WLS_PIN_1 12
 #define WLS_SENSOR1 9
 
 
-#define MICROSTEPS 3200   //Anzahl der Mikroschritte des Motors pro Umdrehung
+#define MICROSTEPS 1600   //Anzahl der Mikroschritte des Motors pro Umdrehung
 
 Stepper motor(MICROSTEPS, DIR_PIN, PUL_PIN);      // Schrittmotor-Objekt erstellen
 
@@ -45,6 +45,7 @@ int prevEndButtonState1 = HIGH;
 int prevWLS_ButtonState1 = HIGH;
 int WLS_SENSOR = HIGH;
 
+
 void setup() {
 
   Serial.begin(9600);               // Initialisierung der seriellen Kommunikation
@@ -63,14 +64,19 @@ void setup() {
   Serial.println(F("SSD1306 allocation failed"));
   for(;;);                                                    // Don't proceed, loop forever
   }
+
+  display.clearDisplay();                               //Nach Start mit leeren Display starten
+  display.display();
+ 
 } 
+
 void showDisplay() {
   display.clearDisplay();
   display.setCursor(10,20);
   display.setTextSize(2);
   display.setTextColor(SSD1306_WHITE);
-  display.println("Hoehe: ");
-  display.print(stepSize * 0.01953125, 2);
+  display.println("Height: ");
+  display.print(stepSize * 0.15625, 2);
   display.print(" mm");
   display.display();
 }
@@ -84,6 +90,8 @@ void loop() {
   int WLS_ButtonState1 = digitalRead(WLS_PIN_1);
   int WLS_SENSOR = digitalRead(WLS_SENSOR1);
 
+
+
 if (buttonState3 == LOW) {          // Wenn der dritte Taster gedrückt wird, Speedchange
   Startzeit = millis();
 if (Startzeit - GesicherteZeit > 50)
@@ -92,12 +100,12 @@ if (Startzeit - GesicherteZeit > 50)
  digitalWrite(buttonState3, SpeedMode);
 
 if (SpeedMode == true) {
-    motor.setSpeed(160);          // Motorgeschwindigkeit
+    motor.setSpeed(320);          // Motorgeschwindigkeit
 } else {motor.setSpeed(40);}
 } 
  if (buttonState1 == LOW && prevButtonState1 == HIGH && EndButtonState2 == HIGH) {           // Wenn der erste Taster gedrückt wird und der vorherige Zustand nicht gedrückt war
     while (digitalRead(BUTTON_PIN_1) == LOW && (digitalRead(EndBUTTON_PIN_2) == HIGH)) {          // Solange der erste Taster gedrückt ist und der Endschalter nicht ausgelöst wurde
-      motor.step(100);                                            // Drehung um 100 Mikrostufen im Uhrzeigersinn
+      motor.step(100);                                            // Drehung um 200 Mikrostufen im Uhrzeigersinn
       ++stepSize;                                                 // Inkrementiere die Schrittgröße
       delay(10);          // Kurze Verzögerung für eine angemessene Geschwindigkeit
       showDisplay();      // Ausgabe der Schrittgröße in Millimeter über OLED Display
@@ -105,18 +113,29 @@ if (SpeedMode == true) {
    }
   if (buttonState2 == LOW && prevButtonState2 == HIGH && EndButtonState1 == HIGH) {          // Zweite Taster gedrückt und der vorherige Zustand nicht gedrückt war und der Endestopp nicht ausgelöst hat
     while (digitalRead(BUTTON_PIN_2) == LOW && (digitalRead(EndBUTTON_PIN_1) == HIGH)) {    // Solange der zweite Taster gedrückt ist und Endschalter nicht betätigt
-      motor.step(-100);                     // Drehung um 100 Mikrostufen gegen den Uhrzeigersinn
+      motor.step(-100);                     // Drehung um 200 Mikrostufen gegen den Uhrzeigersinn
       --stepSize;                           // Dekrementiere die Schrittgröße
       delay(10);                             // Kurze Verzögerung für eine angemessene Geschwindigkeit
       showDisplay();                         // Ausgabe der Schrittgröße in Millimeter über OLED Display
     }
   }
   if (WLS_ButtonState1 == LOW && prevWLS_ButtonState1 == HIGH) {                      //Motor dreht solange nach oben bis der Werkzeuglängenmesser auslöst
-    while (digitalRead(WLS_SENSOR1) == HIGH){
+    while (digitalRead(WLS_SENSOR1) == HIGH && (digitalRead(EndBUTTON_PIN_1) == HIGH)){
     motor.setSpeed(80);
-    motor.step(5000);
+    motor.step(50);
     delay(10);
    }
+  }
+  if (WLS_ButtonState1 == HIGH && WLS_SENSOR == LOW) {{
+    display.clearDisplay();
+    display.setCursor(1,1);
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.println("Werkzeug");
+    display.println("Laengenmessung");
+    display.println("Abgeschlossen");
+    display.display();
+  }
   }
   
   prevButtonState1 = buttonState1;
