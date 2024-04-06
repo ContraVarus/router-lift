@@ -72,11 +72,12 @@ void setup() {
 
 void showDisplay() {
   display.clearDisplay();
-  display.setCursor(10,20);
+  display.setCursor(10,10);
   display.setTextSize(2);
   display.setTextColor(SSD1306_WHITE);
   display.println("Height: ");
-  display.print(stepSize * 0.15625, 2);
+  display.setCursor(10,40);
+  display.print(stepSize * 0.15625, 1);
   display.print(" mm");
   display.display();
 }
@@ -113,13 +114,23 @@ if (SpeedMode == true) {
    }
   if (buttonState2 == LOW && prevButtonState2 == HIGH && EndButtonState1 == HIGH) {          // Zweite Taster gedrückt und der vorherige Zustand nicht gedrückt war und der Endestopp nicht ausgelöst hat
     while (digitalRead(BUTTON_PIN_2) == LOW && (digitalRead(EndBUTTON_PIN_1) == HIGH)) {    // Solange der zweite Taster gedrückt ist und Endschalter nicht betätigt
-      motor.step(-100);                     // Drehung um 200 Mikrostufen gegen den Uhrzeigersinn
+      motor.step(-100);                     // Drehung um x Mikrostufen gegen den Uhrzeigersinn
       --stepSize;                           // Dekrementiere die Schrittgröße
       delay(10);                             // Kurze Verzögerung für eine angemessene Geschwindigkeit
       showDisplay();                         // Ausgabe der Schrittgröße in Millimeter über OLED Display
     }
   }
   if (WLS_ButtonState1 == LOW && prevWLS_ButtonState1 == HIGH) {                      //Motor dreht solange nach oben bis der Werkzeuglängenmesser auslöst
+    display.clearDisplay();
+    display.setCursor(30,8);
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.println("Werkzeug");
+    display.setCursor(20,24);
+    display.println("Laengenmessung");
+    display.setCursor(28,40);
+    display.println("Gestartet");
+    display.display();
     while (digitalRead(WLS_SENSOR1) == HIGH && (digitalRead(EndBUTTON_PIN_1) == HIGH)){
     motor.setSpeed(80);
     motor.step(50);
@@ -128,11 +139,13 @@ if (SpeedMode == true) {
   }
   if (WLS_ButtonState1 == HIGH && WLS_SENSOR == LOW) {{
     display.clearDisplay();
-    display.setCursor(1,1);
+    display.setCursor(30,8);
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
     display.println("Werkzeug");
+    display.setCursor(20,24);
     display.println("Laengenmessung");
+    display.setCursor(22,40);
     display.println("Abgeschlossen");
     display.display();
   }
