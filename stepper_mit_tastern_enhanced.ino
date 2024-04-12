@@ -1,15 +1,9 @@
 #include <Adafruit_SSD1306.h>
-
 #include <Adafruit_GFX.h>
-
 #include <Adafruit_GrayOLED.h>
-
 #include <Adafruit_SPITFT.h>
-
 #include <Adafruit_SPITFT_Macros.h>
-
 #include <gfxfont.h>
-
 #include <splash.h>
 
 #include <Stepper.h>
