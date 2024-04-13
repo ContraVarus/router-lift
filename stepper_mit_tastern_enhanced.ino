@@ -1,12 +1,12 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_GrayOLED.h>
-#include <Adafruit_SPITFT.h>
-#include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
 #include <splash.h>
 
 #include <Stepper.h>
+
+#include <SPI.h>
+#include <Wire.h>
 
 #define DIR_PIN 6 // Definition der Pins für den Schrittmotor
 #define PUL_PIN 5
@@ -27,10 +27,14 @@ Stepper motor(MICROSTEPS, DIR_PIN, PUL_PIN); // Schrittmotor-Objekt erstellen
 
 #define SCREEN_WIDTH 128 //OLED Definition
 #define SCREEN_HEIGHT 64
-#define OLED_RESET - 1
-#define SCREEN_ADDRESS 0x3C
+#define OLED_RESET  11
+#define OLED_MOSI 12
+#define OLED_CLK  13
+#define OLED_DC 10
+#define OLED_CS 9
+#define SCREEN_ADDRESS 0x3D
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, & Wire, OLED_RESET); //Display Objekt erstellen
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); //Display Objekt erstellen
 
 int prevButtonState1 = HIGH; // Variable zur Speicherung des vorherigen Zustands der Taster
 int prevButtonState2 = HIGH;
@@ -150,7 +154,6 @@ void loop() {
       display.display();
     }
   }
-
   prevButtonState1 = buttonState1;
   prevButtonState2 = buttonState2;
   prevButtonState3 = buttonState3; // Speichere den aktuellen Zustand der Taster für den nächsten Durchlauf
