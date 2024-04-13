@@ -8,8 +8,8 @@
 #include <SPI.h>
 #include <Wire.h>
 
-#define DIR_PIN 6 // Definition der Pins für den Schrittmotor
-#define PUL_PIN 5
+#define DIR_PIN 8 // Definition der Pins für den Schrittmotor
+#define PUL_PIN 7
 
 #define BUTTON_PIN_1 7 // Definition der Pins für die Taster
 #define BUTTON_PIN_2 8
@@ -28,9 +28,9 @@ Stepper motor(MICROSTEPS, DIR_PIN, PUL_PIN); // Schrittmotor-Objekt erstellen
 #define SCREEN_WIDTH 128 //OLED Definition
 #define SCREEN_HEIGHT 64
 #define OLED_RESET  11
-#define OLED_MOSI 12
-#define OLED_CLK  13
-#define OLED_DC 10
+#define OLED_MOSI 12  //Pin SDA on OLED
+#define OLED_CLK  13  // Pin SCL on OLED
+#define OLED_DC 10  
 #define OLED_CS 9
 #define SCREEN_ADDRESS 0x3D
 
