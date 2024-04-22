@@ -31,7 +31,7 @@ int lastpos = 0;
 signed long position = 0;
 
 AccelStepper stepper(AccelStepper::DRIVER, stepPin, dirPin);
-EncoderStepCounter encoder(ENCODER_PIN1, ENCODER_PIN2);
+EncoderStepCounter encoder(ENCODER_PIN1, ENCODER_PIN2, HALF_STEP);
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); 
 
 void setup() {
@@ -48,8 +48,9 @@ void setup() {
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { 
     Serial.println(F("SSD1306 allocation failed"));
     for (;;);
+    display.clearDisplay();
+    display.display();
   }
-
 }
 
 void interrupt() {
@@ -63,12 +64,10 @@ void showDisplay() {
   display.setTextColor(SSD1306_WHITE);
   display.println("Height: ");
   display.setCursor(10, 40);
-  display.print(position * 0.15625, 1);
+  display.print(position * 0.025, 1);
   display.print(" mm");
   display.display();
 }
-
-
 
 void loop() {
   signed char pos = encoder.getPosition();
@@ -81,6 +80,7 @@ void loop() {
   if (position != lastpos) {
     stepper.moveTo(position);
     stepper.run();
+    Serial.println(position);
     showDisplay();
   }
 
