@@ -21,8 +21,8 @@
 #define OLED_CS 8
 #define SCREEN_ADDRESS 0x3D
 
-const int dirPin = 9;
-const int stepPin = 10;
+const int dirPin = 10;
+const int stepPin = 9;
 int lastpos = 0;
 signed long position = 0;
 signed char pos = 0;
@@ -62,9 +62,6 @@ void showDisplay() {
   display.setCursor(10, 20);
   display.print(position * 0.0125, 1);
   display.print(" mm");
-  // display.setCursor(10, 40);
-  // display.print("moved: ");
-  // display.print(moved);
   display.display();
 }
 
@@ -77,7 +74,12 @@ void loop() {
   pos = encoder.getPosition();
   position += pos;
   encoder.reset();
+  showDisplay();
   if (millis() - lastMoveTime >= TimeOut){
-    showDisplay();
- } else {display.clearDisplay();}
+    Serial.println(position);
+    stepper.moveTo(position);
+    stepper.setMaxSpeed(40);
+    stepper.setAcceleration(50.0);
+    stepper.run();
+  } 
 }
