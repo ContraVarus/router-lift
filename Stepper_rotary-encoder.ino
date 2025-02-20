@@ -40,7 +40,7 @@ void setup() {
   attachInterrupt(ENCODER_INT2, interrupt, CHANGE);
 
   stepper.setMaxSpeed(400);
-  stepper.setAcceleration(50.0);
+  stepper.setAcceleration(100);
 
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
     Serial.println(F("SSD1306 allocation failed"));
@@ -60,9 +60,15 @@ void showDisplay() {
   display.print(char(0x94));
   display.print("he:");
   display.setCursor(10, 20);
-  display.print(position * 0.0125, 1);
+  display.print(position * 0.01, 2);
   display.print(" mm");
   display.display();
+}
+
+void motorRun() {
+    stepper.runToNewPosition(position);   //blocking function to avoid issues with LCD / not optimal 
+    stepper.setSpeed(300);
+    stepper.runSpeedToPosition();
 }
 
 void interrupt() {
@@ -76,10 +82,6 @@ void loop() {
   encoder.reset();
   showDisplay();
   if (millis() - lastMoveTime >= TimeOut){
-    Serial.println(position);
-    stepper.moveTo(position);
-    stepper.setMaxSpeed(40);
-    stepper.setAcceleration(50.0);
-    stepper.run();
+    motorRun();
   } 
 }
