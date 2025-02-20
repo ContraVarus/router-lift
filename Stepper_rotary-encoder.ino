@@ -65,12 +65,6 @@ void showDisplay() {
   display.display();
 }
 
-void motorRun() {
-    stepper.runToNewPosition(position);   //blocking function to avoid issues with LCD / not optimal 
-    stepper.setSpeed(300);
-    stepper.runSpeedToPosition();
-}
-
 void interrupt() {
   encoder.tick();
   lastMoveTime = millis();
@@ -80,8 +74,13 @@ void loop() {
   pos = encoder.getPosition();
   position += pos;
   encoder.reset();
-  showDisplay();
+
   if (millis() - lastMoveTime >= TimeOut){
-    motorRun();
-  } 
+    stepper.moveTo(position);   
+    stepper.run();
+  }
+  else {
+    stepper.stop();
+    showDisplay();
+  }
 }
