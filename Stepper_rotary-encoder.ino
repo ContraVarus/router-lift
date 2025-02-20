@@ -12,6 +12,9 @@
 #define ENCODER_PIN2 3
 #define ENCODER_INT2 digitalPinToInterrupt(ENCODER_PIN2)
 
+#define EndBUTTON_PIN_1 11 // Definition der Pins für die beiden Endschalter
+#define EndBUTTON_PIN_2 12
+
 #define SCREEN_WIDTH 128 //OLED Definition
 #define SCREEN_HEIGHT 64
 #define OLED_RESET  4
@@ -28,6 +31,8 @@ signed long position = 0;
 signed char pos = 0;
 unsigned long lastMoveTime = 0;
 unsigned long TimeOut = 2000;
+int prevEndButtonState1 = HIGH;
+int prevEndButtonState2 = HIGH;
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS); //Display Objekt erstellen
 EncoderStepCounter encoder(ENCODER_PIN1, ENCODER_PIN2, FULL_STEP);
@@ -38,6 +43,9 @@ void setup() {
   encoder.begin();
   attachInterrupt(ENCODER_INT1, interrupt, CHANGE);
   attachInterrupt(ENCODER_INT2, interrupt, CHANGE);
+
+  pinMode(EndBUTTON_PIN_1, INPUT_PULLUP); //Endschalter
+  pinMode(EndBUTTON_PIN_2, INPUT_PULLUP);//Endschalter
 
   stepper.setMaxSpeed(400);
   stepper.setAcceleration(100);
@@ -71,6 +79,12 @@ void interrupt() {
 }
 
 void loop() {
+
+  int EndButtonState1 = digitalRead(EndBUTTON_PIN_1); // Initalisierung für die Endschalter
+  int EndButtonState2 = digitalRead(EndBUTTON_PIN_2);
+
+// Hier sollte Code für die Endschalter stehen
+
   pos = encoder.getPosition();
   position += pos;
   encoder.reset();
