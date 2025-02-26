@@ -7,13 +7,17 @@
 
 #include <EncoderStepCounter.h>
 
+//Definition for Encoder and Interrupt Assignment
 #define ENCODER_PIN1 2
 #define ENCODER_INT1 digitalPinToInterrupt(ENCODER_PIN1)
 #define ENCODER_PIN2 3
 #define ENCODER_INT2 digitalPinToInterrupt(ENCODER_PIN2)
 
-#define EndBUTTON_PIN_1 11 // Definition der Pins für die beiden Endschalter
-#define EndBUTTON_PIN_2 12
+//Definition for Endbuttons with Interrupts
+#define EndBUTTON_PIN_1 19
+#define EndBUTTON_INT_1 digitalPinToInterrupt(EndBUTTON_PIN_1)
+#define EndBUTTON_PIN_2 20
+#define EndBUTTON_INT_2 digitalPinToInterrupt(EndBUTTON_PIN_2)
 
 #define SCREEN_WIDTH 128 //OLED Definition
 #define SCREEN_HEIGHT 64
@@ -41,13 +45,13 @@ AccelStepper stepper(AccelStepper::DRIVER, stepPin, dirPin);
 void setup() {
   Serial.begin(9600);
   encoder.begin();
-  attachInterrupt(ENCODER_INT1, interrupt, CHANGE);
-  attachInterrupt(ENCODER_INT2, interrupt, CHANGE);
+  attachInterrupt(ENCODER_INT1, Encoder, CHANGE);
+  attachInterrupt(ENCODER_INT2, Encoder, CHANGE);
 
-  pinMode(EndBUTTON_PIN_1, INPUT_PULLUP); //Endschalter
-  pinMode(EndBUTTON_PIN_2, INPUT_PULLUP);//Endschalter
+  attachInterrupt(EndBUTTON_PIN_1, Endpoint, CHANGE);
+  attachInterrupt(EndBUTTON_PIN_2, Endpoint, CHANGE);
 
-  stepper.setMaxSpeed(400);
+  stepper.setMaxSpeed(600);
   stepper.setAcceleration(100);
 
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) { // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
@@ -73,15 +77,21 @@ void showDisplay() {
   display.display();
 }
 
-void interrupt() {
+void Encoder() {
   encoder.tick();
   lastMoveTime = millis();
 }
 
+void Endpoint() {
+
+  // Definition für Endpoint ISR 
+}
+
+
 void loop() {
 
-  int EndButtonState1 = digitalRead(EndBUTTON_PIN_1); // Initalisierung für die Endschalter
-  int EndButtonState2 = digitalRead(EndBUTTON_PIN_2);
+// Hier sollte Code für die Endschalter stehen
+
 
 // Hier sollte Code für die Endschalter stehen
 
@@ -97,4 +107,6 @@ void loop() {
     stepper.stop();
     showDisplay();
   }
+  // prevEndButtonState1 = EndButtonState1;
+  // prevEndButtonState2 = EndButtonState2;
 }
